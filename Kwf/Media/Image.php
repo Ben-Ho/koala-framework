@@ -82,6 +82,9 @@ class Kwf_Media_Image
         else $scale = self::SCALE_BESTFIT;
         if (!$scale) $scale = self::SCALE_BESTFIT;
 
+        $resizeWidth = null;
+        $resizeHeight = null;
+
         if ($width == 0 && $height == 0 && $scale != self::SCALE_ORIGINAL) {
             return false;
         }
@@ -114,7 +117,10 @@ class Kwf_Media_Image
                     ."Kwf_Media_Image::SCALE_BESTFIT would be better?");
             }
 
-            if (($width / $height) >= ($size[0] / $size[1])) {
+            if (isset($targetSize['resizeWidth']) && isset($targetSize['resizeHeight'])) {
+                $resizeWidth = $targetSize['resizeWidth'];
+                $resizeHeight = $targetSize['resizeHeight'];
+            } else if (($width / $height) >= ($size[0] / $size[1])) {
                 $resizeWidth  = $width;
                 $resizeHeight = 0;
                 $cropFromWidth  = $resizeWidth;
@@ -126,13 +132,17 @@ class Kwf_Media_Image
                 $cropFromHeight = $resizeHeight;
             }
 
-            if ($cropFromWidth > $width) { // Wenn hochgeladenes Bild breiter als anzuzeigendes Bild ist
+            if (isset($targetSize['x'])) {
+                $x = $targetSize['x'];
+            } else if ($cropFromWidth > $width) { // Wenn hochgeladenes Bild breiter als anzuzeigendes Bild ist
                 $x = ($cropFromWidth - $width) / 2; // Ursprungs-X berechnen
             } else {
                 $x = 0; // Bei 0 mit Beschneiden beginnen
                 $width = $cropFromWidth; // Breite auf Originalgröße begrenzen
             }
-            if ($cropFromHeight > $height) {
+            if (isset($targetSize['y'])) {
+                $y = $targetSize['y'];
+            } else if ($cropFromHeight > $height) {
                 $y = ($cropFromHeight - $height) / 2;
             } else {
                 $y = 0;
@@ -197,12 +207,17 @@ class Kwf_Media_Image
         $height = round($height);
         if ($width <= 0) $width = 1;
         if ($height <= 0) $height = 1;
-        return array(
+        $ret = array(
             'width' => $width,
             'height' => $height,
             'scale' => $scale,
             'rotate' => $rotate
         );
+        if ($resizeWidth && $resizeHeight) {
+            $ret['resizeWidth'] = $resizeWidth;
+            $ret['resizeHeight'] = $resizeHeight;
+        }
+        return $ret;
     }
 
     public static function scale($source, $size)
@@ -244,8 +259,8 @@ class Kwf_Media_Image
                 if (isset($size['rotate']) && $size['rotate']) {
                     $im->rotateImage('#FFF', $size['rotate']);
                 }
-                $im->scaleImage($size['resizeWidth'], $size['resizeHeight']);
                 $im->cropImage($size['width'], $size['height'], $size['x'], $size['y']);
+                $im->scaleImage($size['resizeWidth'], $size['resizeHeight']);
                 $im->setImagePage(0, 0, 0, 0);
     //             $im->unsharpMaskImage(1, 0.5, 1.0, 0.05);
                 $ret = $im->getImageBlob();

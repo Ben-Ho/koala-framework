@@ -291,6 +291,16 @@ class Kwc_Abstract_Image_Component extends Kwc_Abstract_Composite_Component
         }
         $s['scale'] = $d['scale'];
         if (isset($d['aspectRatio'])) $s['aspectRatio'] = $d['aspectRatio'];
+
+        if ($row->crop_width && $row->crop_height) {
+            $s['x'] = $row->crop_x;
+            $s['y'] = $row->crop_y;
+            $s['resizeWidth'] = $s['width'];
+            $s['width'] = $row->crop_width;
+            $s['resizeHeight'] = $s['height'];
+            $s['height'] = $row->crop_height;
+        }
+
         return $s;
     }
 
