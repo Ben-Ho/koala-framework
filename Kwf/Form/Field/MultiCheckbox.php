@@ -51,11 +51,11 @@ class Kwf_Form_Field_MultiCheckbox extends Kwf_Form_Field_Abstract
         $this->_relationToValuesRule = $relationToValuesRule;
 
         $fieldKey = $relationToValuesRule;
-        $i = 2;
-        while (in_array($fieldKey, self::$_multiCheckboxes)) {
-            $fieldKey = $relationToValuesRule.$i++;
-        }
-        self::$_multiCheckboxes[] = $fieldKey;
+//         $i = 2;
+//         while (in_array($fieldKey, self::$_multiCheckboxes)) {
+//             $fieldKey = $relationToValuesRule.$i++;
+//         }
+//         self::$_multiCheckboxes[] = $fieldKey;
 
         parent::__construct($fieldKey);
         if ($title) {
